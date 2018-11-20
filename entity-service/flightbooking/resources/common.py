@@ -1,9 +1,14 @@
 import falcon
 import time, datetime
+from flightbooking.models.booking import FlightClass
 
 def date_to_string(dt):
     if isinstance(dt, datetime.datetime):
         return "{}-{}-{}T{}:{}:{}".format(dt.day, dt.month, dt.year, dt.hour, dt.minute, dt.second)
+
+def flightclass_to_string(fc):
+    if isinstance(fc, FlightClass):
+        return fc.value
 
 def get_all(name, query, attributes):
     items = []
@@ -12,9 +17,11 @@ def get_all(name, query, attributes):
         data = {}
         for k in attributes:
             try:
-                if (k == "departuretime"):
+                if k == "departuretime":
                     data[k] = date_to_string(item.__dict__[k])
-                else:
+                elif k == "flightclass":
+                    data[k] = flightclass_to_string(item.__dict__[k])
+                else :
                     data[k] = item.__dict__[k]
             except:
                 raise falcon.HTTPBadGateway()
@@ -38,8 +45,10 @@ def get_one(query, attributes):
     data = {}
     for k in attributes:
         try:
-            if (k == "departuretime"):
+            if k == "departuretime":
                 data[k] = date_to_string(query.__dict__[k])
+            elif k == "flightclass":
+                data[k] = flightclass_to_string(query.__dict__[k])
             else :
                 data[k] = query.__dict__[k]
         except:
@@ -60,8 +69,12 @@ def create(session, resource, attributes):
         session.add(resource)
         data = {}
         for k in attributes:
-            data[k] = resource.__dict__[k]
-
+            if k == "departuretime":
+                data[k] = date_to_string(resource.__dict__[k])
+            elif k == "flightclass":
+                data[k] = flightclass_to_string(resource.__dict__[k])
+            else :
+                data[k] = resource.__dict__[k]
         result = {
             "meta": {
                 "code": 201,
@@ -80,7 +93,11 @@ def update(data, session, query, attributes):
     for k, v in data.items():
         if k not in attributes:
             raise falcon.HTTPInvalidParam(k, "Invalid param")
-        updated_data[k] = v
+
+        if k == "departuretime":
+            updated_data[k] = date_to_string(v)
+        else:
+            updated_data[k] = v
 
     try:
         query.update(

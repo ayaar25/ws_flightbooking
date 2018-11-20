@@ -17,7 +17,7 @@ class BookingsCollectionResource(BaseResource):
     """
     def on_get(self, req, res):
         session = req.context['session']
-        q_bookings = session.query(Booking).filter_by(visibility=1)
+        q_bookings = session.query(Booking)
         session = req.context['session']
         result = get_all(
             name='bookings',
