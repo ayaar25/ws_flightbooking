@@ -1,0 +1,449 @@
+{
+	"info": {
+		"_postman_id": "5c4aec60-cb25-4743-a73a-f49b612ecf88",
+		"name": "FlightBooking",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Read One Passanger",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8000/passangers/1/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"passangers",
+						"1",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read All Passanger",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8000/passangers/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"passangers",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Passanger",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"ayu\",\n\t\"origin\": \"Rusia\",\n\t\"phonenumber\": \"08562653391\",\n\t\"email\": \"ayu@gmail.com\",\n\t\"dob\": \"2018-06-25\",\n\t\"sex\": \"F\",\n\t\"nationality\": \"Indonesia\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8000/passangers/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"passangers",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Airline",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"flightnumber\":\"GA125\",\n\t\"origin\":\"Indonesia\",\n\t\"name\":\"Garuda Indonesia\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8000/airlines",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"airlines"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read One Airline",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8000/airlines/GA124",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"airlines",
+						"GA124"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read All Airlines",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8000/airlines",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"airlines"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Schedule",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"flightnumber\":\"GA125\",\n\t\"departuretime\":\"2018-11-23 8:20\",\n\t\"departurefrom\":\"Jakarta\",\n\t\"departureto\":\"Toronto\",\n\t\"pricefirst\":24000000,\n\t\"pricebusiness\":20000000,\n\t\"priceeconomy\":15000000,\n\t\"seatsfirst\":20,\n\t\"seatsbusiness\":20,\n\t\"seatseconomy\":140\n}"
+				},
+				"url": {
+					"raw": "localhost:8000/schedules",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"schedules"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read All Schedule",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"flightnumber\":\"CT7-1\",\n\t\"departuredate\":\"2018-11-22\",\n\t\"departuretime\":\"23:15:00\",\n\t\"departurefrom\":\"Jakarta\",\n\t\"departureto\":\"Toronto\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8000/schedules",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"schedules"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read One Schedule",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8000/schedules/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"schedules",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Booking",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"flightnumber\":\"GA124\",\n\t\"email\":\"ayu@gmail.com\",\n\t\"scheduleid\":1,\n\t\"numberofseats\":1,\n\t\"flightclass\":\"first\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8000/bookings",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"bookings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read All Booking",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8000/bookings/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"bookings",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read One Booking",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8000/bookings/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"bookings",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Schedule",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"seatsfirst\":20,\n\t\"seatsbusiness\":20,\n\t\"seatseconomy\":120\n}"
+				},
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Transaction",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8000/transactions/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"transactions",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read One Transaction",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read All Transaction",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8000/transactions/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"transactions",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Transaction",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"paymentstate\":\"T\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8000/transactions/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"transactions",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

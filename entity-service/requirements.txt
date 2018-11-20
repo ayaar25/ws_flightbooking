@@ -1,0 +1,10 @@
+falcon
+sqlalchemy==1.2.7
+gunicorn
+jsonschema
+falcon-cors
+mysql-connector-python
+falcon-auth
+httpie
+cryptography
+alembic

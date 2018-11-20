@@ -1,0 +1,24 @@
+{
+	"title":"create_schedule",
+	"type":"object",
+	"properties": {
+		"flightnumber": {
+			"type":"string"
+		},
+		"departuretime": {
+			"type":"string"
+		},
+		"departurefrom": {
+			"type":"string"
+		},
+		"departureto": {
+			"type":"string"
+		}
+	},
+	"required": [
+		"flightnumber",
+		"departuretime",
+		"departurefrom",
+		"departureto"
+	]
+}
