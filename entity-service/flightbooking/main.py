@@ -23,14 +23,12 @@ class App(falcon.API):
         self.add_route('/schedules', schedule.SchedulesCollectionResource())
         self.add_route('/schedules/{scheduleid}', schedule.SchedulesResource())
 
-       self.add_route('/bookings', booking.BookingsCollectionResource())
+        self.add_route('/bookings', booking.BookingsCollectionResource())
         self.add_route('/bookings/{bookingid}', booking.BookingsResource())
 
         self.add_route('/transactions', transaction.TransactionsCollectionResource())
         self.add_route('/transactions/{transactionid}', transaction.TransactionsResource())
 
-        self.add_route('/transactions', transaction.TransactionsCollectionResource())
-        self.add_route('/transactions/{transaction_id}', transaction.TransactionsResource())
         # Add route here
         self.add_error_handler(AppError, AppError.handle)
 

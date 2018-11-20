@@ -76,41 +76,9 @@ class TransactionResourceNotFound(AppError):
 
 # ===== RESOURCE ALREADY EXISTED ERROR HANDLER
 
-<<<<<<< HEAD
-class BookingResourceAlreadyExisted(AppError):
-    def __init__(self, description=None):
-        super(BookingResourceAlreadyExisted, self).__init__(ERR_BOOKING_RESOURCE_ALREADY_EXISTED)
-        self.error['title'] += (": " + description if description else "")
-        self.error['description'] = description
-
-class AirlineResourceAlreadyExisted(AppError):
-    def __init__(self, description=None):
-        super(AirlineResourceAlreadyExisted, self).__init__(ERR_AIRLINE_RESOURCE_ALREADY_EXISTED)
-        self.error['title'] += (": " + description if description else "")
-        self.error['description'] = description
-
-class ScheduleResourceAlreadyExisted(AppError):
-    def __init__(self, description=None):
-        super(ScheduleResourceAlreadyExisted, self).__init__(ERR_SCHEDULE_RESOURCE_ALREADY_EXISTED)
-        self.error['title'] += (": " + description if description else "")
-        self.error['description'] = description
-
-class PassangerResourceAlreadyExisted(AppError):
-    def __init__(self, description=None):
-        super(PassangerResourceAlreadyExisted, self).__init__(ERR_PASSANGER_RESOURCE_ALREADY_EXISTED)
-        self.error['title'] += (": " + description if description else "")
-        self.error['description'] = description
-
-class TransactionResourceAlreadyExisted(AppError):
-    def __init__(self, description=None):
-        super(TransactionResourceAlreadyExisted, self).__init__(ERR_TRANSACTION_RESOURCE_ALREADY_EXISTED)
-        self.error['title'] += (": " + description if description else "")
-        self.error['description'] = description
-=======
 class ResourceAlreadyExisted(AppError):
     def __init__(self, name, description=None):
         super(ResourceAlreadyExisted, self).__init__(
             ERR_RESOURCE_ALREADY_EXISTED)
         self.error['title'] = (name + " already existed")
         self.error['description'] = description
->>>>>>> entity-service

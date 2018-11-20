@@ -17,7 +17,7 @@ class Schedule(Base):
     pricefirst = Column(Integer, default=0)
     pricebusiness = Column(Integer, default=0)
     priceeconomy = Column(Integer, nullable=False)
-   	seatsfirst = Column(Integer)
+    seatsfirst = Column(Integer)
     seatsbusiness = Column(Integer)
     seatseconomy = Column(Integer, nullable=False)
     
