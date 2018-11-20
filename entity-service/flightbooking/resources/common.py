@@ -1,4 +1,9 @@
 import falcon
+import time, datetime
+
+def date_to_string(dt):
+    if isinstance(dt, datetime.datetime):
+        return "{}-{}-{}T{}:{}:{}".format(dt.day, dt.month, dt.year, dt.hour, dt.minute, dt.second)
 
 def get_all(name, query, attributes):
     items = []
@@ -7,7 +12,10 @@ def get_all(name, query, attributes):
         data = {}
         for k in attributes:
             try:
-                data[k] = item.__dict__[k]
+                if (k == "departuretime"):
+                    data[k] = date_to_string(item.__dict__[k])
+                else:
+                    data[k] = item.__dict__[k]
             except:
                 raise falcon.HTTPBadGateway()
         items.append(data)
@@ -30,7 +38,10 @@ def get_one(query, attributes):
     data = {}
     for k in attributes:
         try:
-            data[k] = query.__dict__[k]
+            if (k == "departuretime"):
+                data[k] = date_to_string(query.__dict__[k])
+            else :
+                data[k] = query.__dict__[k]
         except:
             raise falcon.HTTPBadGateway()
 

@@ -11,10 +11,6 @@ from flightbooking.exceptions import AppError, InvalidParameterError, UserNotExi
 from flightbooking.custom_exceptions import NoError, ResourceCreated, ResourceDeleted, ResourceNotFound, ResourceAlreadyExisted
 from .common import get_all, create, get_one, update
 
-def date_to_string(dt):
-    if isinstance(dt, datetime.datetime):
-        return "{}-{}-{}T{}:{}:{}".format(dt.day, dt.month, dt.year, dt.hour, dt.minute, dt.second)
-
 class SchedulesCollectionResource(BaseResource):
     def on_get(self, req, res):
         session = req.context['session']
@@ -25,7 +21,7 @@ class SchedulesCollectionResource(BaseResource):
             result = get_all(
                 name='schedules',
                 query=q,
-                attributes=["flightnumber", "departurefrom",
+                attributes=["flightnumber", "departuretime", "departurefrom",
                             "departureto", "pricefirst", "pricebusiness", "priceeconomy"]
 
             )
@@ -33,7 +29,7 @@ class SchedulesCollectionResource(BaseResource):
             result = get_all(
                 name='schedules',
                 query=session.query(Schedule),
-                attributes=["flightnumber", "departurefrom",
+                attributes=["flightnumber", "departuretime", "departurefrom",
                             "departureto", "pricefirst", "pricebusiness", "priceeconomy"]
             )
 
