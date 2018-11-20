@@ -110,7 +110,7 @@ class SchedulesResource(BaseResource):
             session=session,
             query=session.query(Schedule),
             attributes=[
-                "departuretime", "pricefirst", "pricebusiness", "priceeconomy"
+                "departuretime", "seatsfirst", "seatsbusiness", "seatseconomy"
             ]
         )
 
