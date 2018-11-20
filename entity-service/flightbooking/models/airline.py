@@ -11,6 +11,9 @@ class Airline(Base):
     flightnumber = Column(String(10), primary_key=True)
     name = Column(String(50), nullable=False)
     origin = Column(String(50), nullable=False)
+    seatsfirst=Column(Integer, nullable=False)
+    seatsbusiness=Column(Integer, nullable=False)
+    seatseconomy=Column(Integer, nullable=False)
     
     bookings = relationship("Booking", back_populates="airlines")
     schedules = relationship("Schedule", back_populates="airlines")
