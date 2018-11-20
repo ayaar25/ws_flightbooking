@@ -104,7 +104,7 @@ class SchedulesResource(BaseResource):
         result = update(
             data=data,
             session=session,
-            query=session.query(Schedule),
+            query=session.query(Schedule).filter_by(scheduleid=scheduleid),
             attributes=[
                 "departuretime", "seatsfirst", "seatsbusiness", "seatseconomy"
             ]
