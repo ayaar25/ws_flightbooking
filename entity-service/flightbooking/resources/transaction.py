@@ -8,7 +8,7 @@ from flightbooking.schemas import load_schema
 from flightbooking.resources import BaseResource
 from flightbooking.models import Airline, Passanger, Booking, Schedule, Transaction
 from flightbooking.exceptions import AppError, InvalidParameterError, UserNotExistsError, PasswordNotMatch
-from flightbooking.custom_exceptions import NoError, ResourceCreated, ResourceDeleted, ResourceNotFound
+from flightbooking.custom_exceptions import NoError, ResourceCreated, ResourceDeleted, ResourceNotFound,ResourceAlreadyExisted
 from .common import get_all, create, get_one, update
 
 class TransactionsCollectionResource(BaseResource):
@@ -18,10 +18,41 @@ class TransactionsCollectionResource(BaseResource):
         result = get_all(
             name='transactions',
             query=session.query(Transaction),
-            attributes=["transactionid", "bookingid", "paymentstate"]
+            attributes=["transactionid", "bookingid", "paymentstate","totalpayment"]
         )
 
         res.status = falcon.HTTP_OK
+        res.media = result
+
+    def on_post(self,req,res):
+        session = req.context['session']
+
+        data = req.media
+        attributes = [
+            "bookingid", "paymentstate", "totalpayment"
+        ]
+        for attr in attributes:
+            if data.get(attr) == None:
+                raise falcon.HTTPMissingParam(attr)
+
+        q_booking = session.query(Booking).filter_by(bookingid=data.get('bookingid')).first()
+        if q_booking is not None:
+            raise ResourceAlreadyExisted("Booking")
+
+        try:
+            result = create(
+                session=session, 
+                resource=Transaction(
+                    bookingid=data.get("bookingid"),
+                    paymentstate=data.get("paymentstate"),
+                    totalpayment=data.get("totalpayment")
+                ),
+                attributes=attributes
+            )
+        except:
+            raise falcon.HTTPBadGateway()
+    
+        res.status = falcon.HTTP_CREATED
         res.media = result
 
 class TransactionsResource(BaseResource):
