@@ -1,5 +1,6 @@
 const { Client, logger } = require('camunda-external-task-client-js')
-const https = require('https');
+const http = require('http');
+const request = require('request');
 
 const config = {
     baseUrl: 'http://localhost:8080/engine-rest',
@@ -8,37 +9,71 @@ const config = {
 
 const client = new Client(config)
 
-client.subscribe('calculate-refund', async ({ task, taskService }) => {
-    const booking_id = task.variables.get('booking_id')
-
-    request('http://localhost:8000/bookings/'+booking_id, { json: true }, (err, res, body) => {
-        if (err) { return console.log(err); }
-        
-        console.log(`all is well`);
-        booking_data = body.data;
-        scheduleid = booking_data.scheduleid;
-
-        flightclass = booking_data.flightclass;
-    });
-
-    console.log(`Your refund is 5000 and your id is ${booking_id}`);
-
-    // Complete the task
-    // await taskService.complete(task);
-    return {
-        moneyValue: 50000
-    }
-})
-
 client.subscribe('reject-cancelation', async ({ task, taskService }) => {
-    const booking_id = task.variables.get('booking_id')
-    console.log(`Your cancelation rejected, booking id ${booking_id} is not valid`);
-
-    // Complete the task
-    // await taskService.complete(task);
+    const bookingId = task.variables.get('booking_id')
+    console.log(`reject, booking_id : ${bookingId}`)
     // return {
     //     variables: {
-    //         isValid: false
+    //         isValid: true
+    //     }
+    // }
+})
+
+client.subscribe('calculate-refund', async ({ task, taskService }) => {
+    const bookingId = task.variables.get('booking_id')
+    console.log(`calculate, booking_id : ${bookingId}`)
+
+    request('http://localhost:8000/bookings/'+bookingId, { json: true }, (err, res, body) => {
+        if (err) { return console.log(err); }
+
+        booking_data = body.data;
+        scheduleid = booking_data.scheduleid;
+        numberofseats = booking_data.numberofseats;
+        flightclass = booking_data.flightclass;
+
+        console.log(`scheduleid:, ${scheduleid}`);
+
+        request('http://localhost:8000/schedules/'+scheduleid, { json: true }, (err, res, body) => {
+            if (err) { return console.log(err); }
+
+            schedule_data = body.data;
+            if (flightclass == 1) {
+                refund = schedule_data.pricefirst * numberofseats;
+                data = {
+                    "seatsfirst": schedule_data.seatsfirst + 1
+                }
+            } else if (flightclass == 2) {
+                refund = schedule_data.pricebusiness * numberofseats;
+                data = {
+                    "seatsbusiness": schedule_data.seatsbusiness + 1
+                }
+            } else {
+                refund = schedule_data.priceeconomy * numberofseats;
+                data = {
+                    "seatseconomy": schedule_data.seatseconomy + 1
+                }
+            }
+
+            console.log(refund);
+            console.log(data);
+
+            const options = {  
+                url: 'http://localhost:8000/schedules/'+scheduleid,
+                method: 'PUT',
+                json: data
+            };
+
+            request(options, (err, res, body) => {
+                let json = JSON.parse(body);
+                console.log(json);
+            });
+
+        });
+
+    }); 
+    // return {
+    //     variables: {
+    //         moneyValue: 50000
     //     }
     // }
 })
