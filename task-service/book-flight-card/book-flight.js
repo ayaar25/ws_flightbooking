@@ -10,6 +10,7 @@ const config = { baseUrl: 'http://localhost:8080/engine-rest', use: logger };
 
 // create a Client instance with custom configuration
 const client = new Client(config);
+const localVariables = new Variables();
 
 // subscribe to the topic: 'book-flight-card'
 client.subscribe('book-flight-card', async function({ task, taskService }) {
@@ -43,31 +44,40 @@ client.subscribe('book-flight-card', async function({ task, taskService }) {
       } else if (flightclass == "3") {
         seats_amount = schedule_data.seatseconomy;
       }
-      console.log('seats_amount: ');
+      console.log('seats_amount: ' + seats_amount);
 
       if (seats_amount > 0) {
-        if (flightclass == "first") {
+        if (flightclass == "1") {
           schedule_data.seatsfirst -= 1;
-        } else if (flightclass == "business") {
+        } else if (flightclass == "2") {
           schedule_data.seatsbusiness -= 1;
-        } else if (flightclass == "economy") {
+        } else if (flightclass == "3") {
           schedule_data.seatseconomy -= 1;
         }
 
         req_json = {
-          "seatsfirst":schedule_data.seatsfirst,
-          "seatsbusiness":schedule_data.seatsbusiness,
-          "seatseconomy":schedule_data.seatseconomy
+          seatsfirst:schedule_data.seatsfirst,
+          seatsbusiness:schedule_data.seatsbusiness,
+          seatseconomy:schedule_data.seatseconomy
         }
         console.log(req_json);
 
-        // request('http://localhost:8000/schedules/'+scheduleid+'');
-        request.put('http://localhost:8000/schedules/'+scheduleid).form(req_json);
+
+        const options = {  
+                url: 'http://localhost:8000/schedules/'+scheduleid,
+                method: 'PUT',
+                json: req_json
+            };
+
+        request(options, (err, res, body) => {
+            let json = body;
+            console.log(json);
+        });
+
+        localVariables.set("isBookingValid", true);
       }
     });
 
   }); 
-  
-  // Complete the task
-  await taskService.complete(task);
+
 });
