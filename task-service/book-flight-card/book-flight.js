@@ -6,22 +6,25 @@ const request = require('request');
 const config = { baseUrl: 'http://localhost:8080/engine-rest', use: logger };
 
 const client = new Client(config);
-const localVariables = new Variables();
+
+var valid = false;
 
 client.subscribe('book-flight-card', async function({ task, taskService }) {
 
   const booking_id = task.variables.get('booking_id');
+  const isvalid = task.variables.get('isBookingValid');
+  console.log('test' + isvalid);
 
   request('http://localhost:8000/bookings/'+booking_id, { json: true }, (err, res, body) => {
     if (err) { return console.log(err); }
     
     var booking_data = body.data;
     var scheduleid = booking_data.scheduleid;
-
     var flightclass = booking_data.flightclass;
 
     request('http://localhost:8000/schedules/'+scheduleid, { json: true }, (err, res, body) => {
       if (err) { return console.log(err); }
+      
       var schedule_data = body.data;
 
       if (flightclass == "1") {
@@ -31,7 +34,6 @@ client.subscribe('book-flight-card', async function({ task, taskService }) {
       } else if (flightclass == "3") {
         seats_amount = schedule_data.seatseconomy;
       }
-      console.log('seats_amount: ' + seats_amount);
 
       if (seats_amount > 0) {
         if (flightclass == "1") {
@@ -43,12 +45,10 @@ client.subscribe('book-flight-card', async function({ task, taskService }) {
         }
 
         req_json = {
-          seatsfirst:schedule_data.seatsfirst,
-          seatsbusiness:schedule_data.seatsbusiness,
-          seatseconomy:schedule_data.seatseconomy
+          seatsfirst: schedule_data.seatsfirst,
+          seatsbusiness: schedule_data.seatsbusiness,
+          seatseconomy: schedule_data.seatseconomy
         }
-        console.log(req_json);
-
 
         const options = {  
                 url: 'http://localhost:8000/schedules/'+scheduleid,
@@ -59,12 +59,16 @@ client.subscribe('book-flight-card', async function({ task, taskService }) {
         request(options, (err, res, body) => {
             let json = body;
             console.log(json);
+            if (!err) {
+              valid = true;
+            }
         });
 
-        localVariables.set("isBookingValid", true);
       }
     });
 
-  }); 
 
+  }); 
+  const localVariables = new Variables().set("isBookingValid", valid);
+  await taskService.complete(task, localVariables, );
 });
