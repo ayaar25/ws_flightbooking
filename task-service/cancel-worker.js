@@ -32,7 +32,6 @@ client.subscribe('calculate-refund', async ({ task, taskService }) => {
         flightclass = booking_data.flightclass;
 
         console.log(`scheduleid:, ${scheduleid}`);
-
         request('http://localhost:8000/schedules/'+scheduleid, { json: true }, (err, res, body) => {
             if (err) { return console.log(err); }
 
@@ -40,17 +39,17 @@ client.subscribe('calculate-refund', async ({ task, taskService }) => {
             if (flightclass == 1) {
                 refund = schedule_data.pricefirst * numberofseats;
                 data = {
-                    "seatsfirst": schedule_data.seatsfirst + 1
+                    "seatsfirst": schedule_data.seatsfirst + numberofseats
                 }
             } else if (flightclass == 2) {
                 refund = schedule_data.pricebusiness * numberofseats;
                 data = {
-                    "seatsbusiness": schedule_data.seatsbusiness + 1
+                    "seatsbusiness": schedule_data.seatsbusiness + numberofseats
                 }
             } else {
                 refund = schedule_data.priceeconomy * numberofseats;
                 data = {
-                    "seatseconomy": schedule_data.seatseconomy + 1
+                    "seatseconomy": schedule_data.seatseconomy + numberofseats
                 }
             }
 
@@ -64,16 +63,22 @@ client.subscribe('calculate-refund', async ({ task, taskService }) => {
             };
 
             request(options, (err, res, body) => {
-                let json = JSON.parse(body);
+                let json = body;
                 console.log(json);
             });
-
+            return data;
         });
 
+        const options = {  
+            url: 'http://localhost:8000/bookings/'+bookingId,
+            method: 'DELETE',
+        };
+
+        request(options, (err, res, body) => {
+            let json = body;
+            console.log(json);
+        });
+
+
     }); 
-    // return {
-    //     variables: {
-    //         moneyValue: 50000
-    //     }
-    // }
 })
