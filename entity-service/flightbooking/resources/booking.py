@@ -119,27 +119,6 @@ class BookingsResource(BaseResource):
         res.status = falcon.HTTP_200
         res.media = result
 
-    # def on_put(self, req, res, bookingid):
-    #     session = req.context['session']
-    #     data = req.media
-
-    #     q_booking = session.query(Booking).filter_by(
-    #         bookingid=bookingid).first()
-    #     if q_booking is None:
-    #         raise ResourceNotFound("Booking")
-
-    #     result = update(
-    #         data=data,
-    #         session=session,
-    #         query=session.query(Booking),
-    #         attributes=[
-    #             "visibility"
-    #         ]
-    #     )
-
-    #     res.status = falcon.HTTP_200
-    #     res.media = result
-
     def on_delete(self, req, res, bookingid):
         session = req.context['session']
         q_booking = session.query(Booking).filter_by(
@@ -147,38 +126,43 @@ class BookingsResource(BaseResource):
         if q_booking is None:
             raise ResourceNotFound('Booking')
 
+        fc = flightclass_to_string(q_booking.__dict__['flightclass'])
+        print("fc :", fc)
+        if fc == 1:
+            flight_class = "first"
+        elif fc == 2:
+            flight_class = "business"
+        elif fc == 3:
+            flight_class = "economy"
+        print("flight_class :", flight_class)
         q_schedule = session.query(Schedule).filter_by(
             scheduleid=q_booking.__dict__['scheduleid']).first()
         if q_schedule is None:
             raise ResourceNotFound("Schedule")
+
+        bookingid = q_booking.__dict__['bookingid']
+        scheduleid = q_schedule.__dict__['scheduleid']
+        seats = q_schedule.__dict__['seats' + flight_class] + q_booking.__dict__['numberofseats']
         
         print("WWOWOWWY")
-
+        print(q_booking)
 
         result = update(
             data={
                 'isdelete': True
             },
             session=session,
-            query=session.query(Booking),
+            query=session.query(Booking).filter_by(bookingid=bookingid),
             attributes=["isdelete"]
         )
-        flight_class = flightclass_to_string(q_booking.__dict__['flightclass'])
-        if flight_class == "1":
-            flight_class = "first"
-        elif flight == "2":
-            flight_class = "business"
-        else:
-            flight_class = "economy"
 
         result_2 = update(
             data={
-                'scheduleid': q_schedule.__dict__['q_schedule'],
-                'seats' + flight_class: q_schedule.__dict__['seats' + flight_class] + q_booking.__dict__['numberofseats']
+                'seats' + flight_class: seats
             },
             session=session,
-            query=session.query(Schedule),
-            attributes=["scheduleid", "seats"]
+            query=session.query(Schedule).filter_by(scheduleid=scheduleid),
+            attributes=["seats" + flight_class]
         )
         res.status = falcon.HTTP_200
         res.media = result
