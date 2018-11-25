@@ -100,9 +100,7 @@ def update(data, session, query, attributes):
             updated_data[k] = v
 
     try:
-        query.update(
-            updated_data
-        )
+        query.update(updated_data)
     except:
         import traceback
         traceback.print_exc()
