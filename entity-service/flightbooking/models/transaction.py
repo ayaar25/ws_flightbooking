@@ -13,4 +13,4 @@ class Transaction(Base):
     paymentstate = Column(String(1), nullable=False)
     totalpayment = Column(Integer, nullable=False)
     
-    bookings = relationship("Booking", back_populates="transactions")
+    bookings = relationship("Booking", back_populates="transactions", cascade="all")

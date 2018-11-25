@@ -9,7 +9,7 @@ from flightbooking.resources import BaseResource
 from flightbooking.models import Airline, Passanger, Booking, Schedule, Transaction
 from flightbooking.exceptions import AppError, InvalidParameterError, UserNotExistsError, PasswordNotMatch
 from flightbooking.custom_exceptions import NoError, ResourceCreated, ResourceDeleted, ResourceNotFound
-from .common import get_all, create, get_one, update
+from .common import get_all, create, get_one, update, flightclass_to_string
 
 class BookingsCollectionResource(BaseResource):
     """
@@ -157,14 +157,20 @@ class BookingsResource(BaseResource):
 
         result = update(
             data={
-                'bookingid': bookingid,
                 'isdelete': True
             },
             session=session,
             query=session.query(Booking),
-            attributes=["bookingid", "isdelete"]
+            attributes=["isdelete"]
         )
-        flight_class = q_booking.__dict__['flightclass']
+        flight_class = flightclass_to_string(q_booking.__dict__['flightclass'])
+        if flight_class == "1":
+            flight_class = "first"
+        elif flight == "2":
+            flight_class = "business"
+        else:
+            flight_class = "economy"
+
         result_2 = update(
             data={
                 'scheduleid': q_schedule.__dict__['q_schedule'],
