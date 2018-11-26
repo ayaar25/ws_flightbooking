@@ -22,7 +22,7 @@ class BookingsCollectionResource(BaseResource):
         result = get_all(
             name='bookings',
             query=q_bookings.filter_by(isdelete=False),
-            attributes=["email", "flightnumber",
+            attributes=["bookingid","email", "flightnumber",
                         "scheduleid", "numberofseats", "flightclass"]
         )
 
@@ -113,7 +113,7 @@ class BookingsResource(BaseResource):
 
         result = get_one(
             query=q_booking,
-            attributes=["email", "flightnumber",
+            attributes=["bookingid","email", "flightnumber",
                         "scheduleid", "numberofseats", "flightclass"]
         )
         res.status = falcon.HTTP_200
@@ -126,27 +126,6 @@ class BookingsResource(BaseResource):
         if q_booking is None:
             raise ResourceNotFound('Booking')
 
-        fc = flightclass_to_string(q_booking.__dict__['flightclass'])
-        print("fc :", fc)
-        if fc == 1:
-            flight_class = "first"
-        elif fc == 2:
-            flight_class = "business"
-        elif fc == 3:
-            flight_class = "economy"
-        print("flight_class :", flight_class)
-        q_schedule = session.query(Schedule).filter_by(
-            scheduleid=q_booking.__dict__['scheduleid']).first()
-        if q_schedule is None:
-            raise ResourceNotFound("Schedule")
-
-        bookingid = q_booking.__dict__['bookingid']
-        scheduleid = q_schedule.__dict__['scheduleid']
-        seats = q_schedule.__dict__['seats' + flight_class] + q_booking.__dict__['numberofseats']
-        
-        print("WWOWOWWY")
-        print(q_booking)
-
         result = update(
             data={
                 'isdelete': True
@@ -156,13 +135,5 @@ class BookingsResource(BaseResource):
             attributes=["isdelete"]
         )
 
-        result_2 = update(
-            data={
-                'seats' + flight_class: seats
-            },
-            session=session,
-            query=session.query(Schedule).filter_by(scheduleid=scheduleid),
-            attributes=["seats" + flight_class]
-        )
         res.status = falcon.HTTP_200
         res.media = result
