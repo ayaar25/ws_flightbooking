@@ -8,12 +8,17 @@ const config = { baseUrl: 'http://localhost:8080/engine-rest', use: logger };
 const client = new Client(config);
 
 var valid = false;
+var price = 0;
+
+/*
+ * Book Flight Service 
+ * 
+ */
 
 client.subscribe('book-flight-card', async function({ task, taskService }) {
 
   const booking_id = task.variables.get('booking_id');
-  const isvalid = task.variables.get('isBookingValid');
-  console.log('test' + isvalid);
+  console.log('tes');
 
   request('http://localhost:8000/bookings/'+booking_id, { json: true }, (err, res, body) => {
     if (err) { return console.log(err); }
@@ -29,10 +34,13 @@ client.subscribe('book-flight-card', async function({ task, taskService }) {
 
       if (flightclass == "1") {
         seats_amount = schedule_data.seatsfirst;
+        ticket_price = schedule_data.pricefirst;
       } else if (flightclass == "2") {
         seats_amount = schedule_data.seatsbusiness;
+        ticket_price = schedule_data.pricebusiness;
       } else if (flightclass == "3") {
         seats_amount = schedule_data.seatseconomy;
+        ticket_price = schedule_data.priceeconomy;
       }
 
       if (seats_amount > 0) {
@@ -61,6 +69,7 @@ client.subscribe('book-flight-card', async function({ task, taskService }) {
             console.log(json);
             if (!err) {
               valid = true;
+              price = ticket_price;
             }
         });
 
@@ -69,6 +78,34 @@ client.subscribe('book-flight-card', async function({ task, taskService }) {
 
 
   }); 
-  const localVariables = new Variables().set("isBookingValid", valid);
-  await taskService.complete(task, localVariables, );
+  const isBookingValidVar = new Variables().set("isBookingValid", valid);
+  const ticketPriceVar = new Variables().set("ticket_price", price);
+  console.log(`is booking valid ${valid}`)
+  await taskService.complete(task, isBookingValidVar, ticketPriceVar);
 });
+
+/*
+ * Send Payment Information Service
+ *
+ */
+
+client.subscribe('send-payment-card', async ({ task, taskService }) => {
+  const booking_id = task.variables.get('booking_id');
+  const ticket_price = task.variables.get('ticket_price');
+  
+  // const options = {  
+  //             url: 'http://localhost:8000/schedules/'+scheduleid,
+  //             method: 'PUT',
+  //             json: req_json
+  //         };
+
+  // request(options, (err, res, body) => {
+  //     let json = body;
+  //     console.log(json);
+  //     if (!err) {
+  //       valid = true;
+  //     }
+  // });
+  
+  console.log(`send-refund, booking_id : ${booking_id}, ${ticket_price}`);
+})
