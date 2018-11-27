@@ -1,114 +1,105 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_0lcnzpt" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.0.3">
+  <bpmn:message id="Message_19tc0nh" name="Message_1npplhb" />
+  <bpmn:collaboration id="Collaboration_19fo6s4">
+    <bpmn:participant id="Participant_1k6e0nk" name="Cancel Booking" processRef="cancel-booking" />
+  </bpmn:collaboration>
   <bpmn:process id="cancel-booking" name="Cancel Booking" isExecutable="true">
-    <bpmn:startEvent id="StartEvent_1" name="Cancelation Booking Requested">
-      <bpmn:outgoing>SequenceFlow_0t0545b</bpmn:outgoing>
-    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0q5mrea" sourceRef="calculate-refund" targetRef="IntermediateThrowEvent_15cf3p6" />
+    <bpmn:sequenceFlow id="SequenceFlow_0z5x5d5" name="No" sourceRef="ExclusiveGateway_1jq1w23" targetRef="EndEvent_0v7o7tz">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!isValid}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1oe8jp5" name="Yes" sourceRef="ExclusiveGateway_1jq1w23" targetRef="calculate-refund">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isValid}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1ba6yuc" sourceRef="validate-booking" targetRef="ExclusiveGateway_1jq1w23" />
     <bpmn:sequenceFlow id="SequenceFlow_0t0545b" sourceRef="StartEvent_1" targetRef="validate-booking" />
+    <bpmn:serviceTask id="validate-booking" name="Validate Booking ID" camunda:type="external" camunda:topic="validate-booking">
+      <bpmn:incoming>SequenceFlow_0t0545b</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1ba6yuc</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_0v7o7tz" name="Booking Cancelation Rejected">
+      <bpmn:incoming>SequenceFlow_0z5x5d5</bpmn:incoming>
+      <bpmn:terminateEventDefinition />
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="calculate-refund" name="Calculate Refund" camunda:type="external" camunda:topic="calculate-refund">
+      <bpmn:incoming>SequenceFlow_1oe8jp5</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0q5mrea</bpmn:outgoing>
+    </bpmn:serviceTask>
     <bpmn:exclusiveGateway id="ExclusiveGateway_1jq1w23" name="Is Booking Valid?">
       <bpmn:incoming>SequenceFlow_1ba6yuc</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1oe8jp5</bpmn:outgoing>
       <bpmn:outgoing>SequenceFlow_0z5x5d5</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="SequenceFlow_1ba6yuc" sourceRef="validate-booking" targetRef="ExclusiveGateway_1jq1w23" />
-    <bpmn:sequenceFlow id="SequenceFlow_1oe8jp5" name="Yes" sourceRef="ExclusiveGateway_1jq1w23" targetRef="calculate-refund">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isValid}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:serviceTask id="calculate-refund" name="Calculate Refund" camunda:type="external" camunda:topic="calculate-refund">
-      <bpmn:incoming>SequenceFlow_1oe8jp5</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_0q5mrea</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="SequenceFlow_0z5x5d5" name="No" sourceRef="ExclusiveGateway_1jq1w23" targetRef="EndEvent_0v7o7tz">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!isValid}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="SequenceFlow_0q5mrea" sourceRef="calculate-refund" targetRef="IntermediateThrowEvent_15cf3p6" />
-    <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_15cf3p6" name="Refund Information Sent">
+    <bpmn:startEvent id="StartEvent_1" name="Cancelation Booking Requested">
+      <bpmn:outgoing>SequenceFlow_0t0545b</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="IntermediateThrowEvent_15cf3p6" name="Refund Information Sent">
       <bpmn:incoming>SequenceFlow_0q5mrea</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_1m5wcjq</bpmn:outgoing>
       <bpmn:messageEventDefinition messageRef="Message_19tc0nh" camunda:type="external" camunda:topic="send-refund" />
-    </bpmn:intermediateThrowEvent>
-    <bpmn:endEvent id="EndEvent_0f5bbu2" name="Booking Cancelation Accepted">
-      <bpmn:incoming>SequenceFlow_1m5wcjq</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="SequenceFlow_1m5wcjq" sourceRef="IntermediateThrowEvent_15cf3p6" targetRef="EndEvent_0f5bbu2" />
-    <bpmn:endEvent id="EndEvent_0v7o7tz" name="Booking Cancelation Rejected">
-      <bpmn:incoming>SequenceFlow_0z5x5d5</bpmn:incoming>
-      <bpmn:terminateEventDefinition />
-    </bpmn:endEvent>
-    <bpmn:serviceTask id="validate-booking" name="Validate Booking ID" camunda:type="external" camunda:topic="validate-booking">
-      <bpmn:incoming>SequenceFlow_0t0545b</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_1ba6yuc</bpmn:outgoing>
-    </bpmn:serviceTask>
   </bpmn:process>
-  <bpmn:message id="Message_19tc0nh" name="Message_1npplhb" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="cancel-booking">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_19fo6s4">
+      <bpmndi:BPMNShape id="Participant_1k6e0nk_di" bpmnElement="Participant_1k6e0nk">
+        <dc:Bounds x="90" y="22" width="629" height="294" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
-        <dc:Bounds x="173" y="102" width="36" height="36" />
+        <dc:Bounds x="140" y="103" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="162" y="145" width="59" height="40" />
+          <dc:Bounds x="129" y="146" width="59" height="40" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_0t0545b_di" bpmnElement="SequenceFlow_0t0545b">
-        <di:waypoint x="209" y="120" />
-        <di:waypoint x="259" y="120" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ExclusiveGateway_1jq1w23_di" bpmnElement="ExclusiveGateway_1jq1w23" isMarkerVisible="true">
-        <dc:Bounds x="409" y="95" width="50" height="50" />
+        <dc:Bounds x="376" y="96" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="392" y="65" width="85" height="14" />
+          <dc:Bounds x="359" y="66" width="85" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_1ba6yuc_di" bpmnElement="SequenceFlow_1ba6yuc">
-        <di:waypoint x="359" y="120" />
-        <di:waypoint x="409" y="120" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_1oe8jp5_di" bpmnElement="SequenceFlow_1oe8jp5">
-        <di:waypoint x="459" y="120" />
-        <di:waypoint x="509" y="120" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="475" y="102" width="18" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_14ekm87_di" bpmnElement="calculate-refund">
-        <dc:Bounds x="509" y="80" width="100" height="80" />
+        <dc:Bounds x="476" y="81" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_0z5x5d5_di" bpmnElement="SequenceFlow_0z5x5d5">
-        <di:waypoint x="434" y="145" />
-        <di:waypoint x="434" y="230" />
-        <di:waypoint x="659" y="230" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="439" y="197" width="15" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_0q5mrea_di" bpmnElement="SequenceFlow_0q5mrea">
-        <di:waypoint x="609" y="120" />
-        <di:waypoint x="659" y="120" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="IntermediateThrowEvent_0xg6coo_di" bpmnElement="IntermediateThrowEvent_15cf3p6">
-        <dc:Bounds x="659" y="102" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="637" y="145" width="81" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_0f5bbu2_di" bpmnElement="EndEvent_0f5bbu2">
-        <dc:Bounds x="745" y="102" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="734" y="145" width="59" height="40" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_1m5wcjq_di" bpmnElement="SequenceFlow_1m5wcjq">
-        <di:waypoint x="695" y="120" />
-        <di:waypoint x="745" y="120" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="EndEvent_0bhtjya_di" bpmnElement="EndEvent_0v7o7tz">
-        <dc:Bounds x="659" y="212" width="36" height="36" />
+        <dc:Bounds x="626" y="213" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="648" y="255" width="59" height="40" />
+          <dc:Bounds x="615" y="256" width="59" height="40" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_09h2dzn_di" bpmnElement="validate-booking">
-        <dc:Bounds x="259" y="80" width="100" height="80" />
+        <dc:Bounds x="226" y="81" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0t0545b_di" bpmnElement="SequenceFlow_0t0545b">
+        <di:waypoint x="176" y="121" />
+        <di:waypoint x="226" y="121" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ba6yuc_di" bpmnElement="SequenceFlow_1ba6yuc">
+        <di:waypoint x="326" y="121" />
+        <di:waypoint x="376" y="121" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1oe8jp5_di" bpmnElement="SequenceFlow_1oe8jp5">
+        <di:waypoint x="426" y="121" />
+        <di:waypoint x="476" y="121" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="442" y="103" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0z5x5d5_di" bpmnElement="SequenceFlow_0z5x5d5">
+        <di:waypoint x="401" y="146" />
+        <di:waypoint x="401" y="231" />
+        <di:waypoint x="626" y="231" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="406" y="198" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0q5mrea_di" bpmnElement="SequenceFlow_0q5mrea">
+        <di:waypoint x="576" y="121" />
+        <di:waypoint x="626" y="121" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_05pb7fm_di" bpmnElement="IntermediateThrowEvent_15cf3p6">
+        <dc:Bounds x="626" y="103" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="604" y="146" width="81" height="27" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

@@ -78,7 +78,7 @@ class TransactionsResource(BaseResource):
         result = update(
             data=data,
             session=session,
-            query=session.query(Transaction),
+            query=session.query(Transaction).filter_by(transactionid=transactionid),
             attributes=[
                 "paymentstate"
             ]

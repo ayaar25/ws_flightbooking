@@ -11,6 +11,6 @@ class Transaction(Base):
     transactionid = Column(Integer, primary_key=True, autoincrement=True)
     bookingid = Column(Integer, ForeignKey("bookings.bookingid"), nullable=False)
     paymentstate = Column(String(1), nullable=False)
-    totalpayment = Column(Integer, nullable=False)
+    totalpayment = Column(Integer, nullable=False) #0=not paid, 1=waiting for payment, 2=paid, 3=payment not valid
     
     bookings = relationship("Booking", back_populates="transactions", cascade="all")
