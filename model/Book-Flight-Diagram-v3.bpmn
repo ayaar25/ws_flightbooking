@@ -2,6 +2,10 @@
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0zdfriy" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.0.3">
   <bpmn:collaboration id="flight-booking">
     <bpmn:participant id="Participant_0p9cdvf" name="Flight Booking" processRef="flight-booking-v3" />
+    <bpmn:participant id="Participant_097jljp" name="Cusomer" processRef="Process_0v2466m" />
+    <bpmn:participant id="Participant_1mr3ra3" name="Payment Gateway" processRef="Process_1l28wo3" />
+    <bpmn:messageFlow id="MessageFlow_0fo2l5h" sourceRef="Participant_097jljp" targetRef="StartEvent_1" />
+    <bpmn:messageFlow id="MessageFlow_0kxvglj" sourceRef="Task_1b15ge8" targetRef="Participant_097jljp" />
   </bpmn:collaboration>
   <bpmn:process id="flight-booking-v3" name="Flight Booking v3" isExecutable="true">
     <bpmn:laneSet id="LaneSet_01kmg3f">
@@ -82,6 +86,8 @@
     </bpmn:intermediateCatchEvent>
   </bpmn:process>
   <bpmn:message id="Message_0xwyhab" name="payment_proof" />
+  <bpmn:process id="Process_0v2466m" isExecutable="false" />
+  <bpmn:process id="Process_1l28wo3" isExecutable="false" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="flight-booking">
       <bpmndi:BPMNShape id="Participant_0p9cdvf_di" bpmnElement="Participant_0p9cdvf">
@@ -189,6 +195,20 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="625" y="262" width="85" height="27" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_097jljp_di" bpmnElement="Participant_097jljp">
+        <dc:Bounds x="112" y="522" width="971" height="247" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="MessageFlow_0fo2l5h_di" bpmnElement="MessageFlow_0fo2l5h">
+        <di:waypoint x="227" y="522" />
+        <di:waypoint x="227" y="109" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_0kxvglj_di" bpmnElement="MessageFlow_0kxvglj">
+        <di:waypoint x="524" y="277" />
+        <di:waypoint x="524" y="522" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_1mr3ra3_di" bpmnElement="Participant_1mr3ra3">
+        <dc:Bounds x="112" y="846" width="971" height="247" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
