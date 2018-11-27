@@ -7,8 +7,6 @@ const config = { baseUrl: 'http://localhost:8080/engine-rest', use: logger };
 
 const client = new Client(config);
 
-var valid = false;
-var price = 0;
 
 
 /* * * * * * * * * * * * * * * * * * * *
@@ -17,10 +15,17 @@ var price = 0;
  * * * * * * * * * * * * * * * * * * * *
  */
 
-client.subscribe('book-flight-card', async function({ task, taskService }) {
+client.subscribe('book-flight-card', function({ task, taskService }) {
+  console.log(`
 
+    ***********************
+    [TASK SERVICE EXECUTED]
+    `);
+  var valid =  false;
+  var price =  0;
+
+  
   const booking_id = task.variables.get('booking_id');
-  console.log('tes');
 
   request('http://localhost:8000/bookings/'+booking_id, { json: true }, (err, res, body) => {
     if (err) { return console.log(err); }
@@ -67,25 +72,27 @@ client.subscribe('book-flight-card', async function({ task, taskService }) {
             };
 
         request(options, (err, res, body) => {
-            let json = body;
-            console.log(json);
-            if (!err) {
-              valid = true;
-              price = ticket_price;
-            } else {
-              console.log(err);
-            }
+          let json = body;
+          console.log("json");
+          console.log(json);
+          if (!err) {
+            var valid = true;
+            var price = ticket_price; 
+          } else {
+          }
         });
 
       }
     });
 
+  });
 
-  }); 
-  const isBookingValidVar = new Variables().set("isBookingValid", valid);
-  const ticketPriceVar = new Variables().set("ticket_price", price);
-  console.log(`is booking valid ${valid}`)
-  await taskService.complete(task, isBookingValidVar, ticketPriceVar);
+  const isBookingValidVar = new Variables().set("isBookingValid", true);
+  const ticketPriceVar = new Variables().set("ticket_price", 1000);
+  valid = isBookingValidVar.get("isBookingValid");
+  price = ticketPriceVar.get("ticket_price");
+  console.log(`is_booking_valid: ${valid}; ticket_price: ${price}`);
+  taskService.complete(task, isBookingValidVar, ticketPriceVar);
 });
 
 
@@ -114,6 +121,7 @@ client.subscribe('send-payment-card', async ({ task, taskService }) => {
   // });
   
   console.log(`send-refund, booking_id : ${booking_id}, ${ticket_price}`);
+  taskService.complete(task); 
 })
 
 
@@ -124,13 +132,14 @@ client.subscribe('send-payment-card', async ({ task, taskService }) => {
  */
 
 client.subscribe('validate-payment-card', async function({ task, taskService }) {
-  const isvalid = task.variables.get('isBookingValid');
+  const is_valid = task.variables.get('isBookingValid');
+  const is_payment_valid = new Variables().set("isPaymentValid", true);
 
-  if (isvalid) {
+  if (is_valid) {
     console.log('valid');
   } else {
     console.log('invalid');
   }
 
-  await taskService.complete(task);
+  await taskService.complete(task, is_payment_valid);
 }); 
