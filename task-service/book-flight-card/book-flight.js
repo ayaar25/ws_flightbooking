@@ -10,9 +10,11 @@ const client = new Client(config);
 var valid = false;
 var price = 0;
 
-/*
- * Book Flight Service 
+
+/* * * * * * * * * * * * * * * * * * * *
+ *  Book Flight Service 
  * 
+ * * * * * * * * * * * * * * * * * * * *
  */
 
 client.subscribe('book-flight-card', async function({ task, taskService }) {
@@ -70,6 +72,8 @@ client.subscribe('book-flight-card', async function({ task, taskService }) {
             if (!err) {
               valid = true;
               price = ticket_price;
+            } else {
+              console.log(err);
             }
         });
 
@@ -84,9 +88,11 @@ client.subscribe('book-flight-card', async function({ task, taskService }) {
   await taskService.complete(task, isBookingValidVar, ticketPriceVar);
 });
 
-/*
- * Send Payment Information Service
- *
+
+/* * * * * * * * * * * * * * * * * * * *
+ *  Send Payment Information Service 
+ * 
+ * * * * * * * * * * * * * * * * * * * *
  */
 
 client.subscribe('send-payment-card', async ({ task, taskService }) => {
@@ -109,3 +115,22 @@ client.subscribe('send-payment-card', async ({ task, taskService }) => {
   
   console.log(`send-refund, booking_id : ${booking_id}, ${ticket_price}`);
 })
+
+
+/* * * * * * * * * * * * * * * * * * * *
+ *  Validate Payment Service 
+ * 
+ * * * * * * * * * * * * * * * * * * * *
+ */
+
+client.subscribe('validate-payment-card', async function({ task, taskService }) {
+  const isvalid = task.variables.get('isBookingValid');
+
+  if (isvalid) {
+    console.log('valid');
+  } else {
+    console.log('invalid');
+  }
+
+  await taskService.complete(task);
+}); 
