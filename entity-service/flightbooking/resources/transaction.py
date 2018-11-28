@@ -40,15 +40,19 @@ class TransactionsCollectionResource(BaseResource):
         #     raise ResourceAlreadyExisted("Booking")
 
         try:
+            transaction = Transaction(
+                bookingid=data.get("bookingid"),
+                paymentstate=data.get("paymentstate"),
+                totalpayment=data.get("totalpayment")
+            )
             result = create(
                 session=session, 
-                resource=Transaction(
-                    bookingid=data.get("bookingid"),
-                    paymentstate=data.get("paymentstate"),
-                    totalpayment=data.get("totalpayment")
-                ),
+                resource=transaction,
                 attributes=attributes
             )
+            session.flush()
+            print(result)
+            result['data']['transactionid'] = transaction.transactionid
         except:
             raise falcon.HTTPBadGateway()
     

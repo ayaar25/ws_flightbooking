@@ -51,10 +51,15 @@ client.subscribe('book-flight-card', function({ task, taskService }) {
       }
 
       if (seats_amount < numberofseats) {
-        const isBookingValidVar = new Variables().set("isBookingValid", false)
-        const isPaymentValidVar = new Variables().set("isPaymentValid", false)
-        const ticketPriceVar = new Variables().set("ticket_price", 0)
-        console.log("booking can be created, all seats taken")
+        const dataVar = new Variables()
+        dataVar.setAll({
+          "isBookingValid": false,
+          "isPaymentValid": false,
+          "ticket_price": 0
+        })
+        console.log('Booking not valid!')
+        console.log("All seats taken")
+        taskService.complete(task, dataVar)
         return
       }
       
@@ -80,20 +85,17 @@ client.subscribe('book-flight-card', function({ task, taskService }) {
 
       request(options, (err, res, body) => {
         if (err) { return console.log(err) }
+      
+        const dataVar = new Variables()
+        dataVar.setAll({
+          "isBookingValid": true,
+          "isPaymentValid": false,
+          "ticket_price": ticket_price
+        })
 
-        let json = body
-        console.log("json")
-        console.log(json)
-      })
-
-      const dataVar = new Variables()
-      dataVar.setAll({
-        "isBookingValid": true,
-        "isPaymentValid": false,
-        "ticket_price": ticket_price
-      })
-  
-      taskService.complete(task, dataVar)          
+        console.log('Booking valid!')
+        taskService.complete(task, dataVar)
+      })       
     })
 
   })
@@ -110,6 +112,8 @@ client.subscribe('book-flight-card', function({ task, taskService }) {
 client.subscribe('send-payment-card', async ({ task, taskService }) => {
   const booking_id = task.variables.get('booking_id')
   const ticket_price = task.variables.get('ticket_price')
+
+  console.log('Send Payment')
   
   req_json = {
     'bookingid': booking_id,
@@ -126,13 +130,15 @@ client.subscribe('send-payment-card', async ({ task, taskService }) => {
 
   request(options, (err, res, body) => {
     if (err) { return console.log(err) }
-    console.log(body)
+    const dataVar = new Variables()
+    dataVar.setAll({
+      "transactionid": body.data.transactionid,
+      "totalpayment": body.data.totalpayment
+    })
+    console.log('Payment successfully sent!')
+    taskService.complete(task, dataVar)
   })
-
-  // console.log(`booking-id : ${booking_id}`)
-  // console.log(`ticket-price : ${ticket_price}`)
-  // console.log(`payment-state :`, req_json.paymentstate.name)
-  taskService.complete(task) 
+  
 })
 
 
@@ -144,57 +150,58 @@ client.subscribe('send-payment-card', async ({ task, taskService }) => {
 
 client.subscribe('validate-payment-card', async function({ task, taskService }) {
   const booking_id = task.variables.get('booking_id')
-  const totalpayment = task.variables.get('totalPayment')
-  const isPaymentValidVar = task.variables.get('isPaymentValidVar')
+  const totalpayment = task.variables.get('totalpayment')
+
+  console.log(task.variables.getAll())
 
   //seharusnya menyamakan jumlah yang dibayar dengan yang harus dibayar, klo ga bayar kursinya balik lg
 
-  req_json = {
-    "paymentstate":'not_paid' //not paid
-  }
+  // req_json = {
+  //   "paymentstate":'not_paid' //not paid
+  // }
 
-  const options = {  
-    url: 'http://localhost:8000/transactions/'+booking_id,
-    method: 'GET',
-    json: true
-  }
+  // const options = {  
+  //   url: 'http://localhost:8000/transactions/'+booking_id,
+  //   method: 'GET',
+  //   json: true
+  // }
 
-  request(options, (err, res, body) => {
-    if (err) { return console.log(err) }
-    let transactions_data = body.data
-    console.log(transactions_data)
-    ticket_price = transactions_data.totalpayment
+  // request(options, (err, res, body) => {
+  //   if (err) { return console.log(err) }
+  //   let transactions_data = body.data
+  //   console.log(transactions_data)
+  //   ticket_price = transactions_data.totalpayment
 
-    if (totalpayment == ticket_price) {
-      console.log("payment-state: paid")
-      paymentstate = 'paid' //payment valid
-    } else {
-      console.log("payment-state: payment not valid")
-      paymentstate = 'paid_not_valid' //payment not valid
-    }
+  //   if (totalpayment == ticket_price) {
+  //     console.log("payment-state: paid")
+  //     paymentstate = 'paid' //payment valid
+  //   } else {
+  //     console.log("payment-state: payment not valid")
+  //     paymentstate = 'paid_not_valid' //payment not valid
+  //   }
 
-    req_json = {
-      "paymentstate" : paymentstate
-    }
+  //   req_json = {
+  //     "paymentstate" : paymentstate
+  //   }
 
-    // update payment state
-    const options = {
-      url: 'http://localhost:8000/transactions/'+booking_id,
-      method: 'PUT',
-      json: req_json
-    }
+  //   // update payment state
+  //   const options = {
+  //     url: 'http://localhost:8000/transactions/'+booking_id,
+  //     method: 'PUT',
+  //     json: req_json
+  //   }
 
-    request(options, (err, res, body) => {
-      if (err) { return console.log(err) }
-      let json = body
-      console.log(json)
-    })
+  //   request(options, (err, res, body) => {
+  //     if (err) { return console.log(err) }
+  //     let json = body
+  //     console.log(json)
+  //   })
 
-    isPaymentValidVar.set("isPaymentValid", totalpayment == ticket_price)
-    paymentvalid = isPaymentValidVar.get('isPaymentValid')
-    console.log(`payment-valid: ${paymentvalid}`)
-    taskService.complete(tas, ispaymentvalid)
-  })
+  //   isPaymentValidVar.set("isPaymentValid", totalpayment == ticket_price)
+  //   paymentvalid = isPaymentValidVar.get('isPaymentValid')
+  //   console.log(`payment-valid: ${paymentvalid}`)
+  //   taskService.complete(tas, ispaymentvalid)
+  // })
 }) 
 
 
@@ -209,7 +216,7 @@ client.subscribe('send-abort-card', async ({ task, taskService }) => {
   const isPaymentValidVar = task.variables.get('isPaymentValid')
   console.log(`booking_id : ${bookingid}`)
   if (!isBookingValidVar && !isPaymentValidVar) {
-    console.log("Booking cant be created")
+    console.log("Booking can\'t be created")
   } else {
     console.log("Payment not valid")
   }
