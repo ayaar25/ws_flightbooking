@@ -9,7 +9,7 @@ from flightbooking.resources import BaseResource
 from flightbooking.models import Airline, Passanger, Booking, Schedule, Transaction
 from flightbooking.exceptions import AppError, InvalidParameterError, UserNotExistsError, PasswordNotMatch
 from flightbooking.custom_exceptions import NoError, ResourceCreated, ResourceDeleted, ResourceNotFound
-from .common import get_all, create, get_one, update, flightclass_to_string
+from .common import get_all, create, get_one, update
 
 class BookingsCollectionResource(BaseResource):
     """
@@ -25,7 +25,6 @@ class BookingsCollectionResource(BaseResource):
             attributes=["bookingid","email", "flightnumber",
                         "scheduleid", "numberofseats", "flightclass"]
         )
-
 
         res.status = falcon.HTTP_OK
         res.media = result

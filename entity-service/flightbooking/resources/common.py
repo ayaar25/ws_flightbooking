@@ -6,10 +6,6 @@ def date_to_string(dt):
     if isinstance(dt, datetime.datetime):
         return "{}-{}-{}T{}:{}:{}".format(dt.day, dt.month, dt.year, dt.hour, dt.minute, dt.second)
 
-def flightclass_to_string(fc):
-    if isinstance(fc, FlightClass):
-        return fc.value
-
 def get_all(name, query, attributes):
     items = []
 
@@ -19,8 +15,6 @@ def get_all(name, query, attributes):
             try:
                 if k == "departuretime":
                     data[k] = date_to_string(item.__dict__[k])
-                elif k == "flightclass":
-                    data[k] = flightclass_to_string(item.__dict__[k])
                 else :
                     data[k] = item.__dict__[k]
             except:
@@ -47,8 +41,6 @@ def get_one(query, attributes):
         try:
             if k == "departuretime":
                 data[k] = date_to_string(query.__dict__[k])
-            elif k == "flightclass":
-                data[k] = flightclass_to_string(query.__dict__[k])
             else :
                 data[k] = query.__dict__[k]
         except:
@@ -71,8 +63,6 @@ def create(session, resource, attributes):
         for k in attributes:
             if k == "departuretime":
                 data[k] = date_to_string(resource.__dict__[k])
-            elif k == "flightclass":
-                data[k] = flightclass_to_string(resource.__dict__[k])
             else :
                 data[k] = resource.__dict__[k]
         result = {
