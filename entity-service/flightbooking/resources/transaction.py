@@ -35,9 +35,9 @@ class TransactionsCollectionResource(BaseResource):
             if data.get(attr) == None:
                 raise falcon.HTTPMissingParam(attr)
 
-        q_booking = session.query(Booking).filter_by(bookingid=data.get('bookingid')).first()
-        if q_booking is not None:
-            raise ResourceAlreadyExisted("Booking")
+        # q_booking = session.query(Booking).filter_by(bookingid=data.get('bookingid')).first()
+        # if q_booking is not None:
+        #     raise ResourceAlreadyExisted("Booking")
 
         try:
             result = create(

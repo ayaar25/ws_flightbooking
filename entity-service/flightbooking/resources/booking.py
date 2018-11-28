@@ -42,22 +42,22 @@ class BookingsCollectionResource(BaseResource):
             if data.get(attr) == None:
                 raise falcon.HTTPMissingParam(attr)
         
-        q_passanger = session.query(Passanger).filter_by(email=data.get('email')).first()
-        if q_passanger is None:
-            raise ResourceNotFound("Passanger")
+        # q_passanger = session.query(Passanger).filter_by(email=data.get('email')).first()
+        # if q_passanger is None:
+        #     raise ResourceNotFound("Passanger")
 
-        q_airline = session.query(Airline).filter_by(flightnumber=data.get('flightnumber')).first()
-        if q_airline is None:
-            raise ResourceNotFound("Airline")
+        # q_airline = session.query(Airline).filter_by(flightnumber=data.get('flightnumber')).first()
+        # if q_airline is None:
+        #     raise ResourceNotFound("Airline")
 
-        q_schedule = session.query(Schedule).filter_by(scheduleid=data.get('scheduleid')).first()
-        if q_schedule is None:
-            raise ResourceNotFound("Schedule")
+        # q_schedule = session.query(Schedule).filter_by(scheduleid=data.get('scheduleid')).first()
+        # if q_schedule is None:
+        #     raise ResourceNotFound("Schedule")
 
         try:
-            if (q_schedule.__dict__['seats' + data.get('flightclass')]-data.get(
-                    'numberofseats') < 0):
-                raise ResourceNotFound('Seat')
+            # if (q_schedule.__dict__['seats' + data.get('flightclass')]-data.get(
+            #         'numberofseats') < 0):
+            #     raise ResourceNotFound('Seat')
             booking = Booking(
                 email=data.get('email'),
                 flightnumber=data.get('flightnumber'),
@@ -70,31 +70,31 @@ class BookingsCollectionResource(BaseResource):
                 resource=booking,
                 attributes=attributes
             )
-            session.flush()
-            result_2 = create(
-                session=session,
-                resource=Transaction(
-                    bookingid=booking.bookingid,
-                    paymentstate=0,
-                    totalpayment=data.get(
-                        'numberofseats') * q_schedule.__dict__['price'+data.get('flightclass')]
-                ),
-                attributes=["bookingid", "paymentstate", "totalpayment"]
-            )
-            result_3 = update(
-                data={
-                    'seats' + data.get('flightclass'): q_schedule.__dict__['seats' + data.get('flightclass')]-data.get(
-                        'numberofseats')
-                },
-                session=session,
-                query=session.query(Schedule),
-                attributes=[
-                    "seatsfirst", "seatsbusiness", "seatseconomy"
-                ]
-            )
-            result.update({
-                'totalpayment' : result_2['data']['totalpayment']
-            })
+            # session.flush()
+            # result_2 = create(
+            #     session=session,
+            #     resource=Transaction(
+            #         bookingid=booking.bookingid,
+            #         paymentstate='not_paid',
+            #         totalpayment=data.get(
+            #             'numberofseats') * q_schedule.__dict__['price'+data.get('flightclass')]
+            #     ),
+            #     attributes=["bookingid", "paymentstate", "totalpayment"]
+            # )
+            # result_3 = update(
+            #     data={
+            #         'seats' + data.get('flightclass'): q_schedule.__dict__['seats' + data.get('flightclass')]-data.get(
+            #             'numberofseats')
+            #     },
+            #     session=session,
+            #     query=session.query(Schedule),
+            #     attributes=[
+            #         "seatsfirst", "seatsbusiness", "seatseconomy"
+            #     ]
+            # )
+            # result.update({
+            #     'totalpayment' : result_2['data']['totalpayment']
+            # })
         except Exception as e:
             if isinstance(e, ResourceNotFound):
                 raise e
