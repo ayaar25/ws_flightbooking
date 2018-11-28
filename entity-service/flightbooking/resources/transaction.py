@@ -51,7 +51,6 @@ class TransactionsCollectionResource(BaseResource):
                 attributes=attributes
             )
             session.flush()
-            print(result)
             result['data']['transactionid'] = transaction.transactionid
         except:
             raise falcon.HTTPBadGateway()

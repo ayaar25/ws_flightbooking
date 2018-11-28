@@ -149,6 +149,7 @@ client.subscribe('send-payment-card', async ({ task, taskService }) => {
  */
 
 client.subscribe('validate-payment-card', async function({ task, taskService }) {
+  const transactionid = task.variables.get('transactionid')
   const booking_id = task.variables.get('booking_id')
   const totalpayment = task.variables.get('totalpayment')
 
@@ -156,52 +157,53 @@ client.subscribe('validate-payment-card', async function({ task, taskService }) 
 
   //seharusnya menyamakan jumlah yang dibayar dengan yang harus dibayar, klo ga bayar kursinya balik lg
 
-  // req_json = {
-  //   "paymentstate":'not_paid' //not paid
-  // }
+  req_json = {
+    "paymentstate":'not_paid'
+  }
 
-  // const options = {  
-  //   url: 'http://localhost:8000/transactions/'+booking_id,
-  //   method: 'GET',
-  //   json: true
-  // }
+  const options = {  
+    url: 'http://localhost:8000/transactions/' + transactionid,
+    method: 'GET',
+    json: true
+  }
 
-  // request(options, (err, res, body) => {
-  //   if (err) { return console.log(err) }
-  //   let transactions_data = body.data
-  //   console.log(transactions_data)
-  //   ticket_price = transactions_data.totalpayment
+  request(options, (err, res, body) => {
+    if (err) { return console.log(err) }
+    let transactions_data = body.data
+    console.log(transactions_data)
+    ticket_price = transactions_data.totalpayment
 
-  //   if (totalpayment == ticket_price) {
-  //     console.log("payment-state: paid")
-  //     paymentstate = 'paid' //payment valid
-  //   } else {
-  //     console.log("payment-state: payment not valid")
-  //     paymentstate = 'paid_not_valid' //payment not valid
-  //   }
+    if (totalpayment == ticket_price) {
+      console.log("payment-state: paid")
+      paymentstate = 'paid' //payment valid
+    } else {
+      console.log("payment-state: payment not valid")
+      paymentstate = 'paid_not_valid' //payment not valid
+    }
 
-  //   req_json = {
-  //     "paymentstate" : paymentstate
-  //   }
+    req_json = {
+      "paymentstate" : paymentstate
+    }
 
-  //   // update payment state
-  //   const options = {
-  //     url: 'http://localhost:8000/transactions/'+booking_id,
-  //     method: 'PUT',
-  //     json: req_json
-  //   }
+    // update payment state
+    const options = {
+      url: 'http://localhost:8000/transactions/' + transactionid,
+      method: 'PUT',
+      json: req_json
+    }
 
-  //   request(options, (err, res, body) => {
-  //     if (err) { return console.log(err) }
-  //     let json = body
-  //     console.log(json)
-  //   })
+    request(options, (err, res, body) => {
+      if (err) { return console.log(err) }
+      let json = body
+      console.log(json)
+    })
 
-  //   isPaymentValidVar.set("isPaymentValid", totalpayment == ticket_price)
-  //   paymentvalid = isPaymentValidVar.get('isPaymentValid')
-  //   console.log(`payment-valid: ${paymentvalid}`)
-  //   taskService.complete(tas, ispaymentvalid)
-  // })
+    const dataVar = new Variables()
+    dataVar.setAll({
+      isPaymentValid: true
+    })
+    taskService.complete(task, dataVar)
+  })
 }) 
 
 

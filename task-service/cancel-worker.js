@@ -15,6 +15,14 @@ client.subscribe('send-refund', async ({ task, taskService }) => {
     console.log(`send-refund, booking_id : ${bookingid}`);
     const refund = task.variables.get('refund');
     console.log(`Your refund : ${refund}`);
+    const options = {
+        url: 'http://localhost:8000/bookings/' + bookingid,
+        method: 'DELETE'
+    };
+
+    request(options, (err, res, body) => {
+        let json = body.data;
+    });
 })
 
 client.subscribe('validate-booking', async ({ task, taskService }) => {
@@ -28,11 +36,10 @@ client.subscribe('validate-booking', async ({ task, taskService }) => {
     };
 
     request(options, (err, res, body) => {
-        booking_data = body.data;
-        booking_id = booking_data.bookingid;
-        const isValidVariables = new Variables().set("isValid", booking_id == bookingid);
-
-        taskService.complete(task, isValidVariables);
+        const dataVar = new Variables()
+        dataVar.set('isValid', res.statusCode == 200)
+        console.log('Booking valid?', res.statusCode == 200)
+        taskService.complete(task, dataVar);
     });
 
     
@@ -46,6 +53,7 @@ client.subscribe('calculate-refund', async ({ task, taskService }) => {
         if (err) { return console.log(err); }
 
         booking_data = body.data;
+        console.log(booking_data)
         
         scheduleid = booking_data.scheduleid;
         numberofseats = booking_data.numberofseats;
@@ -86,15 +94,6 @@ client.subscribe('calculate-refund', async ({ task, taskService }) => {
             const sendRefund = new Variables().set("refund", refund);
 
             taskService.complete(task, sendRefund);
-        });
-
-        const options = {  
-            url: 'http://localhost:8000/bookings/'+bookingid,
-            method: 'DELETE'
-        };
-
-        request(options, (err, res, body) => {
-            let json = body.data;
         });
 
     });
