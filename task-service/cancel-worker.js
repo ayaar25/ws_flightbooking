@@ -1,101 +1,100 @@
 const { Client, logger, Variables } = require('camunda-external-task-client-js')
-const http = require('http');
-const request = require('request');
+const http = require('http')
+const request = require('request')
+const cfg = require('./config.json')
 
 const config = {
-    baseUrl: 'http://localhost:8080/engine-rest',
+    baseUrl: cfg.baseUrl,
     use: logger
 }
 
 const client = new Client(config)
 
 client.subscribe('send-refund', async ({ task, taskService }) => {
-    const isvalid = task.variables.get('isValid');
-    const bookingid = task.variables.get('booking_id');
-    console.log(`send-refund, booking_id : ${bookingid}`);
-    const refund = task.variables.get('refund');
-    console.log(`Your refund : ${refund}`);
-    const options = {
-        url: 'http://localhost:8000/bookings/' + bookingid,
-        method: 'DELETE'
-    };
+    const isvalid = task.variables.get('isValid')
+    const bookingid = task.variables.get('booking_id')
+    console.log(`send-refund, booking_id : ${bookingid}`)
+    const refund = task.variables.get('refund')
+    console.log(`Your refund : ${refund}`)
 
-    request(options, (err, res, body) => {
-        let json = body.data;
-    });
+    request({
+        url: cfg.entityUrls.bookings + "/" + bookingid,
+        method: 'DELETE'
+    }, (err, res, body) => {
+        let json = body.data
+    })
 })
 
 client.subscribe('validate-booking', async ({ task, taskService }) => {
-    const bookingid = task.variables.get('booking_id');
-    console.log(`validate, booking_id : ${bookingid}`);
+    const bookingid = task.variables.get('booking_id')
+    console.log(`validate, booking_id : ${bookingid}`)
+    const dataVar = new Variables()
 
-    const options = {  
-        url: 'http://localhost:8000/bookings/'+bookingid,
+    request({
+        url: cfg.entityUrls.bookings + "/" + bookingid,
         method: 'GET',
-        json:true
-    };
-
-    request(options, (err, res, body) => {
-        const dataVar = new Variables()
+        json: true
+    }, (err, res, body) => {
         dataVar.set('isValid', res.statusCode == 200)
         console.log('Booking valid?', res.statusCode == 200)
-        taskService.complete(task, dataVar);
-    });
+        taskService.complete(task, dataVar)
+    })
 
     
 })
 
 client.subscribe('calculate-refund', async ({ task, taskService }) => {
-    const bookingid = task.variables.get('booking_id');
-    console.log(`calculate, booking_id : ${bookingid}`);
+    const bookingid = task.variables.get('booking_id')
+    console.log(`calculate, booking_id : ${bookingid}`)
+    const dataVar = new Variables()
 
-    request('http://localhost:8000/bookings/'+bookingid, { json: true }, (err, res, body) => {
-        if (err) { return console.log(err); }
+    request(cfg.entityUrls.bookings + "/" + bookingid, { json: true }, (err, res, body) => {
+        if (err) { return console.log(err) }
 
-        booking_data = body.data;
+        booking_data = body.data
         console.log(booking_data)
         
-        scheduleid = booking_data.scheduleid;
-        numberofseats = booking_data.numberofseats;
-        flightclass = booking_data.flightclass;
+        scheduleid = booking_data.scheduleid
+        numberofseats = booking_data.numberofseats
+        flightclass = booking_data.flightclass.name
         
-        request('http://localhost:8000/schedules/'+scheduleid, { json: true }, (err, res, body) => {
-            if (err) { return console.log(err); }
-            var refund = 0;
-            schedule_data = body.data;
-            if (flightclass == 1) {
-                refund = schedule_data.pricefirst * numberofseats;
+        request(cfg.entityUrls.schedules + "/" + scheduleid, { json: true }, (err, res, body) => {
+            if (err) { return console.log(err) }
+            var refund = 0
+            schedule_data = body.data
+            if (flightclass == 'first') {
+                refund = schedule_data.pricefirst * numberofseats
                 data = {
                     "seatsfirst": schedule_data.seatsfirst + numberofseats
                 }
-            } else if (flightclass == 2) {
-                refund = schedule_data.pricebusiness * numberofseats;
+            } else if (flightclass == 'business') {
+                refund = schedule_data.pricebusiness * numberofseats
                 data = {
                     "seatsbusiness": schedule_data.seatsbusiness + numberofseats
                 }
-            } else {
-                refund = schedule_data.priceeconomy * numberofseats;
+            } else if (flightclass == 'economy') {
+                refund = schedule_data.priceeconomy * numberofseats
                 data = {
                     "seatseconomy": schedule_data.seatseconomy + numberofseats
                 }
             }
 
-            const options = {  
-                url: 'http://localhost:8000/schedules/'+scheduleid,
+            request({
+                url: cfg.entityUrls.schedules + "/" + scheduleid,
                 method: 'PUT',
                 json: data
-            };
+            }, (err, res, body) => {
+                let json = body.data
+                console.log(json)
+            })
 
-            request(options, (err, res, body) => {
-                let json = body.data;
-                console.log(json);
-            });
+            dataVar.setAll({
+                "refund": refund
+            })
 
-            const sendRefund = new Variables().set("refund", refund);
+            taskService.complete(task, dataVar)
+        })
 
-            taskService.complete(task, sendRefund);
-        });
-
-    });
+    })
     
 })

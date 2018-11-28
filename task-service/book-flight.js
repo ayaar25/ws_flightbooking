@@ -1,11 +1,9 @@
 const { Client, logger, Variables } = require('camunda-external-task-client-js')
 const http = require('http')
 const request = require('request')
-
-const config = { baseUrl: 'http://localhost:8080/engine-rest', use: logger }
-
+const cfg = require('./config.json')
+const config = { baseUrl: cfg.baseUrl, use: logger }
 const client = new Client(config)
-
 
 
 /* * * * * * * * * * * * * * * * * * * *
@@ -18,7 +16,7 @@ client.subscribe('book-flight-card', function({ task, taskService }) {
   const booking_id = task.variables.get('booking_id')
   const dataVar = new Variables()
 
-  request('http://localhost:8000/bookings/' + booking_id, { json: true }, (err, res, body) => {
+  request(cfg.entityUrls.bookings + "/" + booking_id, { json: true }, (err, res, body) => {
     if (err) { return console.log(err) }
     if (res.statusCode != 200){
       console.log('Status code', res.statusCode)
@@ -36,7 +34,7 @@ client.subscribe('book-flight-card', function({ task, taskService }) {
       var flightclass = booking_data.flightclass.name
       var numberofseats = booking_data.numberofseats
 
-      request('http://localhost:8000/schedules/' + scheduleid, { json: true }, (err, res, body) => {
+      request(cfg.entityUrls.schedules + "/" + scheduleid, { json: true }, (err, res, body) => {
         if (err) { return console.log(err) }
         if (res.statusCode != 200) {
           dataVar.setAll({
@@ -74,7 +72,7 @@ client.subscribe('book-flight-card', function({ task, taskService }) {
             taskService.complete(task, dataVar)
           } else {
             request({
-              url: 'http://localhost:8000/schedules/' + scheduleid,
+              url: cfg.entityUrls.schedules + "/" + scheduleid,
               method: 'PUT',
               json: {
                 "seatsfirst": schedule_data.seatsfirst,
@@ -122,7 +120,7 @@ client.subscribe('send-payment-card', async ({ task, taskService }) => {
   const dataVar = new Variables()
 
   request({  
-    url: 'http://localhost:8000/transactions/',
+    url: cfg.entityUrls.transactions + "/",
     method: 'POST',
     json: {
       'bookingid': booking_id,
@@ -153,7 +151,7 @@ client.subscribe('validate-payment-card', async function({ task, taskService }) 
   const totalpayment = task.variables.get('totalPayment')
 
   request({
-    url: 'http://localhost:8000/transactions/' + transactionid,
+    url: cfg.entityUrls.transactions + "/" + transactionid,
     method: 'GET',
     json: true
   }, (err, res, body) => {
@@ -161,7 +159,7 @@ client.subscribe('validate-payment-card', async function({ task, taskService }) 
     totalpayment_expected = body.data.totalpayment
 
     request({
-      url: 'http://localhost:8000/transactions/' + transactionid,
+      url: cfg.entityUrls.transactions + "/" + transactionid,
       method: 'PUT',
       json: {
         "paymentstate": totalpayment == totalpayment_expected ? 'paid' : 'paid_not_valid'

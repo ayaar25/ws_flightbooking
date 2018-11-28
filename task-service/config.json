@@ -1,0 +1,11 @@
+{
+    "baseUrl": "http://localhost:8080/engine-rest",
+    "baseEntityUrl": "http://localhost:8000",
+    "entityUrls": {
+        "passangers": "http://localhost:8000/passangers",
+        "airlines": "http://localhost:8000/airlines",
+        "bookings": "http://localhost:8000/bookings",
+        "schedules": "http://localhost:8000/schedules",
+        "transactions": "http://localhost:8000/transactions"
+    }
+}
