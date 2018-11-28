@@ -1,6 +1,6 @@
 # ws_flightbooking
 
-**ws_flightbooking** merupakan suatu servis yang dibangun untuk memenuhi tugas mata kuliah IF4050 Pengembangan Perangkat Lunak Berorientasi Servis 
+**ws_flightbooking** merupakan suatu servis **pemesanan tiket pesawat** yang dibangun untuk memenuhi tugas mata kuliah IF4050 Pengembangan Perangkat Lunak Berorientasi Servis 
 
 ## Kegunaan
 
