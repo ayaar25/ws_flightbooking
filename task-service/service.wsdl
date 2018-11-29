@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://localhost:8090/api/wsdl" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xs:schema xmlns:tns="http://localhost:8090/api/schemas" targetNamespace="http://localhost:8090/api/schemas" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:complexType name="InitBookingRequest">
+        <xs:sequence>
+          <xs:element minOccurs="1" name="bookId">
+            <xs:simpleType>
+              <xs:restriction base="xs:integer" />
+            </xs:simpleType>
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="CancelBookingRequest">
+        <xs:sequence>
+          <xs:element minOccurs="1" name="bookId">
+            <xs:simpleType>
+              <xs:restriction base="xs:integer" />
+            </xs:simpleType>
+          </xs:element>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="POST_InitBooking_InputMessage">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" name="Body" type="tns:InitBookingRequest" />
+            <xs:element minOccurs="1" name="Content-Type" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="POST_InitBooking_OutputMessage" />
+      <xs:element name="GET_GetBooking_InputMessage">
+        <xs:complexType>
+          <xs:sequence />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="GET_GetBooking_OutputMessage" />
+      <xs:element name="POST_CancelBooking_InputMessage">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="1" name="Body" type="tns:CancelBookingRequest" />
+            <xs:element minOccurs="1" name="Content-Type" type="xs:string" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="POST_CancelBooking_OutputMessage" />
+    </xs:schema>
+  </types>
+  <message name="POST_InitBooking_InputMessage">
+    <part name="POST_InitBooking_InputMessage" xmlns:q1="http://localhost:8090/api/schemas" element="q1:POST_InitBooking_InputMessage" />
+  </message>
+  <message name="POST_InitBooking_OutputMessage">
+    <part name="POST_InitBooking_OutputMessage" xmlns:q2="http://localhost:8090/api/schemas" element="q2:POST_InitBooking_OutputMessage" />
+  </message>
+  <message name="GET_GetBooking_InputMessage">
+    <part name="GET_GetBooking_InputMessage" xmlns:q3="http://localhost:8090/api/schemas" element="q3:GET_GetBooking_InputMessage" />
+  </message>
+  <message name="GET_GetBooking_OutputMessage">
+    <part name="GET_GetBooking_OutputMessage" xmlns:q4="http://localhost:8090/api/schemas" element="q4:GET_GetBooking_OutputMessage" />
+  </message>
+  <message name="POST_CancelBooking_InputMessage">
+    <part name="POST_CancelBooking_InputMessage" xmlns:q5="http://localhost:8090/api/schemas" element="q5:POST_CancelBooking_InputMessage" />
+  </message>
+  <message name="POST_CancelBooking_OutputMessage">
+    <part name="POST_CancelBooking_OutputMessage" xmlns:q6="http://localhost:8090/api/schemas" element="q6:POST_CancelBooking_OutputMessage" />
+  </message>
+  <portType name="NewTaskService_PortType">
+    <operation name="POST_InitBooking">
+      <documentation />
+      <input xmlns:q7="http://localhost:8090/api/wsdl" message="q7:POST_InitBooking_InputMessage" />
+      <output xmlns:q8="http://localhost:8090/api/wsdl" message="q8:POST_InitBooking_OutputMessage">
+        <documentation />
+      </output>
+    </operation>
+    <operation name="GET_GetBooking">
+      <documentation />
+      <input xmlns:q9="http://localhost:8090/api/wsdl" message="q9:GET_GetBooking_InputMessage" />
+      <output xmlns:q10="http://localhost:8090/api/wsdl" message="q10:GET_GetBooking_OutputMessage">
+        <documentation />
+      </output>
+    </operation>
+    <operation name="POST_CancelBooking">
+      <documentation />
+      <input xmlns:q11="http://localhost:8090/api/wsdl" message="q11:POST_CancelBooking_InputMessage" />
+      <output xmlns:q12="http://localhost:8090/api/wsdl" message="q12:POST_CancelBooking_OutputMessage">
+        <documentation />
+      </output>
+    </operation>
+  </portType>
+  <binding name="NewTaskService_Binding" xmlns:q13="http://localhost:8090/api/wsdl" type="q13:NewTaskService_PortType">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+    <operation name="POST_InitBooking">
+      <soap:operation soapAction="POST_InitBooking" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      <input>
+        <soap:body use="literal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </input>
+      <output>
+        <soap:body use="literal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </output>
+    </operation>
+    <operation name="GET_GetBooking">
+      <soap:operation soapAction="GET_GetBooking" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      <input>
+        <soap:body use="literal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </input>
+      <output>
+        <soap:body use="literal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </output>
+    </operation>
+    <operation name="POST_CancelBooking">
+      <soap:operation soapAction="POST_CancelBooking" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      <input>
+        <soap:body use="literal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </input>
+      <output>
+        <soap:body use="literal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+      </output>
+    </operation>
+  </binding>
+  <service name="NewTaskService">
+    <documentation>TODO: Add Description</documentation>
+    <port name="Server1_Port" xmlns:q14="http://localhost:8090/api/wsdl" binding="q14:NewTaskService_Binding">
+      <soap:address location="http%3A%2F%2Flocalhost%3A8090%2Fapi" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" />
+    </port>
+  </service>
+</definitions>

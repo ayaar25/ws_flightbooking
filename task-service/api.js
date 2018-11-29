@@ -3,6 +3,7 @@ var app = express()
 var bodyParser = require('body-parser')
 const request = require('request')
 const cfg = require('./config').config
+const soap = require('soap')
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
@@ -93,6 +94,24 @@ router.route('/cancel')
         })
     })
 
+
+
+var service = {
+    service: {
+        Port: {
+            InitBooking: function (args) {
+                return {
+                    bookId: args.bookId
+                };
+            }
+        }
+    }
+}
+
+var xml = require('fs').readFileSync('service.wsdl', 'utf8')
+
 app.use('/api', router)
-app.listen(port)
+app.listen(port, function () {
+    soap.listen(app, '/wsdl', service, xml)
+})
 console.log('Listening on ' + port)
