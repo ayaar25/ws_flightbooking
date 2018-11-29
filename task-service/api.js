@@ -31,7 +31,6 @@ router.route('/book')
                 }
             }
         }, (err, res2, body) => {
-            console.log("BAAAAAMM")
             cache[body.id] = {
                 'urlPayment': '',
                 'paymentStatus': 'not_paid'
@@ -70,6 +69,28 @@ router.route('/invoke2')
         cache[taskId]['urlPayment'] = ''
         cache[taskId]['paymentStatus'] = 'paid'
         res.json({})
+    })
+
+router.route('/cancel')
+    .post(function (req, res) {
+        bookId = req.body.bookId
+        console.log(bookId)
+        request({
+            url: cfg.baseUrl + "/process-definition/key/cancel-booking/start",
+            method: 'POST',
+            json: {
+                "variables": {
+                    "booking_id": {
+                        "value": bookId,
+                        "type": "long"
+                    }
+                }
+            }
+        }, (err, res2, body) => {
+            res.json({
+                "taskId": body.id
+            })
+        })
     })
 
 app.use('/api', router)
