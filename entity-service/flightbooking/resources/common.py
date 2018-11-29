@@ -1,10 +1,20 @@
 import falcon
 import time, datetime
 from flightbooking.models.booking import FlightClass
+import enum
 
 def date_to_string(dt):
     if isinstance(dt, datetime.datetime):
         return "{}-{}-{}T{}:{}:{}".format(dt.day, dt.month, dt.year, dt.hour, dt.minute, dt.second)
+
+def convert(o):
+    if isinstance(o, enum.Enum):
+        return {
+            'name': str(o).split('.')[-1],
+            'value': o.value
+        }
+    else:
+        return o
 
 def get_all(name, query, attributes):
     items = []
@@ -15,9 +25,11 @@ def get_all(name, query, attributes):
             try:
                 if k == "departuretime":
                     data[k] = date_to_string(item.__dict__[k])
-                else :
-                    data[k] = item.__dict__[k]
-            except:
+                    continue
+                data[k] = convert(item.__dict__[k])
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
                 raise falcon.HTTPBadGateway()
         items.append(data)
 
@@ -41,8 +53,8 @@ def get_one(query, attributes):
         try:
             if k == "departuretime":
                 data[k] = date_to_string(query.__dict__[k])
-            else :
-                data[k] = query.__dict__[k]
+                continue
+            data[k] = convert(query.__dict__[k])
         except:
             raise falcon.HTTPBadGateway()
 
@@ -63,8 +75,8 @@ def create(session, resource, attributes):
         for k in attributes:
             if k == "departuretime":
                 data[k] = date_to_string(resource.__dict__[k])
-            else :
-                data[k] = resource.__dict__[k]
+                continue
+            data[k] = convert(resource.__dict__[k])
         result = {
             "meta": {
                 "code": 201,
@@ -86,8 +98,8 @@ def update(data, session, query, attributes):
 
         if k == "departuretime":
             updated_data[k] = date_to_string(v)
-        else:
-            updated_data[k] = v
+            continue
+        updated_data[k] = v
 
     try:
         query.update(updated_data)

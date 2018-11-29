@@ -25,7 +25,6 @@ class BookingsCollectionResource(BaseResource):
             attributes=["bookingid","email", "flightnumber",
                         "scheduleid", "numberofseats", "flightclass"]
         )
-
         res.status = falcon.HTTP_OK
         res.media = result
 
