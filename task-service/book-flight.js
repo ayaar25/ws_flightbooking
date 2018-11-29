@@ -6,6 +6,7 @@ const config = { baseUrl: cfg.baseUrl, use: logger }
 const bookingUrl = cfg.baseEntityUrl + cfg.entityUrls.bookings
 const scheduleUrl = cfg.baseEntityUrl + cfg.entityUrls.schedules
 const transactionUrl = cfg.baseEntityUrl + cfg.entityUrls.transactions
+const apiUrl = cfg.apiUrl
 const msgUrl = cfg.baseUrl + '/message'
 console.log(msgUrl)
 const client = new Client(config)
@@ -161,6 +162,16 @@ callPaymentService = function (url, args, transactionId, { task, taskService }) 
         result.return.events.forEach(event => {
           if (event.attributes.type == 'OPEN_URL') {
             console.log('Please open', event.attributes.urlToOpen)
+            request({
+              url: apiUrl + '/invoke',
+              method: 'POST',
+              json: {
+                taskId: task.processInstanceId,
+                urlPayment: event.attributes.urlToOpen
+              }
+            }, (err, res, body) => {
+              console.log(res.statusCode)
+            })
             paymentEventId = event.attributes.paymentEventId
             console.log('Payment event id', paymentEventId)
           }
@@ -321,6 +332,16 @@ client.subscribe('send-booking-transaction-card', async ({ task, taskService }) 
   const bookingid = task.variables.get('booking_id')
   console.log(`booking-id: ${bookingid}`)
   console.log("Booking succesfully created")
-  taskService.complete(task)
+  taskService.complete(task).then(() => {
+    request({
+      url: apiUrl + '/invoke2',
+      method: 'POST',
+      json: {
+        taskId: task.processInstanceId
+      }
+    }, (err, res, body) => {
+      console.log(res.statusCode)
+    })
+  })
   return
 })
