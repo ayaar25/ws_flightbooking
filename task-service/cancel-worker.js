@@ -1,12 +1,9 @@
 const { Client, logger, Variables } = require('camunda-external-task-client-js')
-const http = require('http')
 const request = require('request')
-const cfg = require('./config.json')
-
-const config = {
-    baseUrl: cfg.baseUrl,
-    use: logger
-}
+const cfg = require('./config').config
+const config = { baseUrl: cfg.baseUrl, use: logger }
+const bookingUrl = cfg.baseEntityUrl + cfg.entityUrls.bookings
+const scheduleUrl = cfg.baseEntityUrl + cfg.entityUrls.schedules
 
 const client = new Client(config)
 
@@ -18,7 +15,7 @@ client.subscribe('send-refund', async ({ task, taskService }) => {
     console.log(`Your refund : ${refund}`)
 
     request({
-        url: cfg.entityUrls.bookings + "/" + bookingid,
+        url: bookingUrl + "/" + bookingid,
         method: 'DELETE'
     }, (err, res, body) => {
         let json = body.data
@@ -31,7 +28,7 @@ client.subscribe('validate-booking', async ({ task, taskService }) => {
     const dataVar = new Variables()
 
     request({
-        url: cfg.entityUrls.bookings + "/" + bookingid,
+        url: bookingUrl + "/" + bookingid,
         method: 'GET',
         json: true
     }, (err, res, body) => {
@@ -48,7 +45,7 @@ client.subscribe('calculate-refund', async ({ task, taskService }) => {
     console.log(`calculate, booking_id : ${bookingid}`)
     const dataVar = new Variables()
 
-    request(cfg.entityUrls.bookings + "/" + bookingid, { json: true }, (err, res, body) => {
+    request(bookingUrl + "/" + bookingid, { json: true }, (err, res, body) => {
         if (err) { return console.log(err) }
 
         booking_data = body.data
@@ -58,7 +55,7 @@ client.subscribe('calculate-refund', async ({ task, taskService }) => {
         numberofseats = booking_data.numberofseats
         flightclass = booking_data.flightclass.name
         
-        request(cfg.entityUrls.schedules + "/" + scheduleid, { json: true }, (err, res, body) => {
+        request(scheduleUrl + "/" + scheduleid, { json: true }, (err, res, body) => {
             if (err) { return console.log(err) }
             var refund = 0
             schedule_data = body.data
@@ -80,7 +77,7 @@ client.subscribe('calculate-refund', async ({ task, taskService }) => {
             }
 
             request({
-                url: cfg.entityUrls.schedules + "/" + scheduleid,
+                url: scheduleUrl + "/" + scheduleid,
                 method: 'PUT',
                 json: data
             }, (err, res, body) => {

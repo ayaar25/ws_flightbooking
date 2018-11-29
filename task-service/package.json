@@ -4,12 +4,17 @@
   "description": "Receive and record booking information",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "concurrently \"npm run cancel-worker\" \"npm run book-worker\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "cancel-worker": "node cancel-worker.js",
+    "book-worker": "node book-flight.js"
   },
   "author": "Husnulzaki Wibisono Haryadi",
   "license": "ISC",
   "dependencies": {
     "camunda-external-task-client-js": "^1.1.0-alpha1",
-    "request": "^2.88.0"
+    "concurrently": "^4.1.0",
+    "request": "^2.88.0",
+    "soap": "^0.25.0"
   }
 }
